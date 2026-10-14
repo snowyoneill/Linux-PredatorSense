@@ -191,6 +191,9 @@ Packages:
 
 Oct 13, 2026
 
+ui/frontend.py
+- Fan chart Y-axis raised from 5660 to 6000 RPM. The old value was only a display constant (chart axis max + placeholder text), never a cap on the reported speed - the EC tachometer value is shown verbatim - but real peaks (```5882``` observed on a PH315-54) clipped at the top of the graph.
+
 main.py
 - **Fix: crash on exit in the release binary.** ```shutdown()``` called bare ```exit(0)```, which only exists because the ```site``` module injects it - a PyInstaller bundle does not load it, so closing the app raised ```NameError``` inside a Qt signal handler and aborted with ```SIGABRT``` (core dump). Exit is now ```os._exit(0)``` after the EC handle is closed; ```sys.exit()``` is unsafe here because raising ```SystemExit``` through a C++ frame aborts the same way.
 

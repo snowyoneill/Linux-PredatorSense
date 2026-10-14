@@ -631,8 +631,8 @@ class Ui_PredatorSense(object):
         self.cpuChart = CustomChart("CPU Temp", "cpuchart_box", 64, "#800000ff", "#0E86D4", "", "", (0, 63), (0, 110))
         self.gpuChart = CustomChart("GPU Temp", "gpuchart_box", 64, "#8000ff00", "#0E8600", "", "", (0, 63), (0, 110))
         self.sysChart = CustomChart("SYS Temp", "syschart_box", 64, "#8000ffff", "#0Effff", "", "", (0, 63), (0, 110))
-        self.cpuFanChart = CustomChart("CPU Fan", "cpufanchart_box", 64, "#800080ff", "#0E80ff", "", "", (0, 63), (0, 5660))
-        self.gpuFanChart = CustomChart("GPU Fan", "gpufanchart_box", 64, "#8000ff80", "#0Eff80", "", "", (0, 63), (0, 5660))
+        self.cpuFanChart = CustomChart("CPU Fan", "cpufanchart_box", 64, "#800080ff", "#0E80ff", "", "", (0, 63), (0, 6000))
+        self.gpuFanChart = CustomChart("GPU Fan", "gpufanchart_box", 64, "#8000ff80", "#0Eff80", "", "", (0, 63), (0, 6000))
 
         self.chart_box = QtWidgets.QGroupBox(self.monitoring_tab)
         self.chart_box.setObjectName("monitoring_box")
@@ -783,8 +783,8 @@ class Ui_PredatorSense(object):
         # Temp box
         self.temp_box.setTitle("Temps")
 
-        self.cpuFanSpeedValue.setText("5660" + " RPM")
-        self.gpuFanSpeedValue.setText("5660" + " RPM")
+        self.cpuFanSpeedValue.setText("6000" + " RPM")
+        self.gpuFanSpeedValue.setText("6000" + " RPM")
         self.cpuTempValue.setText("100" + "°")
         self.gpuTempValue.setText("100" + "°")
         self.sysTempValue.setText("100" + "°")
