@@ -44,6 +44,7 @@ _[OPTIONAL - undervolt only]_
   ./venv/bin/pip install git+https://github.com/georgewhewell/undervolt.git
   ```
   ```core/intelctl.py``` resolves ```UNDERVOLT_PATH``` to that venv automatically and runs it with ```sys.executable```, so it works under ```sudo``` without a system-wide install and you do **not** need ```which undervolt``` to point anywhere.
+  The release binary needs no install at all: a copy of ```undervolt.py``` (v0.4.0, GPL-2.0-or-later) is vendored in ```core/vendor/``` and bundled into the binary, where it runs with the system ```python3```.
 - **AMD** undervolting uses [amdctl](https://github.com/kevinlekiller/amdctl), a small C program (no pip). Build it and install it somewhere on **root's** PATH (the app runs it as a bare `amdctl` under `sudo`); `/usr/local/bin` works on most distros:
   ```
   sudo apt install build-essential   # amdctl is a C program; needs gcc/make to build
@@ -190,8 +191,11 @@ Packages:
 
 Oct 13, 2026
 
+core/vendor (new)
+- **Intel undervolt now works from the release binary.** ```undervolt.py``` v0.4.0 is vendored from the [upstream project](https://github.com/georgewhewell/undervolt) (GPL-2.0-or-later, license kept in ```core/vendor/LICENSE.txt```) and bundled by PyInstaller via ```main.spec```. In a frozen build the app runs the bundled script with a system ```python3``` (```shutil.which```), since ```sys.executable``` inside a bundle is the app itself, not an interpreter. Source installs are unchanged (venv copy still preferred). If a frozen build finds no ```python3``` at all, the status label says so instead of failing.
+
 core/intelctl.py
-- **Fix: release binary launched itself repeatedly.** In a PyInstaller one-file bundle, ```sys.executable``` is the bundle itself, not a Python interpreter, so the ```sudo <python> undervolt.py -r``` status query actually ran ```sudo <the binary> undervolt.py -r``` - each instance spawned another copy of the app in a chain. Undervolt is now disabled in frozen builds (```sys.frozen```/```_MEIPASS``` guard): the status label reads "Undervolt unavailable in the binary build (install from source)" and no process is spawned. Intel undervolt from source is unchanged.
+- **Fix: release binary launched itself repeatedly.** In a PyInstaller one-file bundle, ```sys.executable``` is the bundle itself, not a Python interpreter, so the ```sudo <python> undervolt.py -r``` status query actually ran ```sudo <the binary> undervolt.py -r``` - each instance spawned another copy of the app in a chain. Frozen builds now resolve a real interpreter (system ```python3```) and the bundled script instead; the relaunch is gone and undervolt works from the binary (see ```core/vendor``` above).
 
 main.py / ui/frontend.py
 - The Offset selector moved out of the Undervolt box into the middle column, directly above the ```Undervolt``` button, so the value and the action are adjacent. The ```Offset:``` label was dropped since each item reads e.g. ```-140 mV```.

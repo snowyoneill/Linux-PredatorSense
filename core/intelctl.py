@@ -7,6 +7,7 @@
 # ---------------------------------##
 
 import os
+import shutil
 import struct
 import sys
 
@@ -19,14 +20,30 @@ UNDERVOLT_PATH = os.path.join(
 )
 
 ## In a PyInstaller one-file bundle there is no venv, and sys.executable points at
-## the bundle itself rather than a Python interpreter. Running "sudo <bundle>
-## undervolt.py -r" would just launch another copy of the app (which would launch
-## another, and so on), so undervolt is disabled in frozen builds until the script
-## is bundled and a real interpreter is resolved.
+## the bundle itself rather than a Python interpreter - running "sudo <bundle>
+## undervolt.py -r" would launch another copy of the app (which would launch
+## another, and so on). Frozen builds instead run the vendored copy of the
+## undervolt script (bundled via main.spec into _MEIPASS/vendor) with a system
+## python3. undervolt is stdlib-only, so any python3 works.
 FROZEN = bool(getattr(sys, "frozen", False) or hasattr(sys, "_MEIPASS"))
 UNDERVOLT_FROZEN_MSG = (
-    "Undervolt unavailable in the binary build (install from source)."
+    "Undervolt unavailable: no python3 interpreter found on this system."
 )
+
+
+def _undervolt_cmd(extra_args):
+    """Build [interpreter, script, *extra_args] for the undervolt helper.
+    Returns None when no usable interpreter/script pair exists (frozen build
+    on a machine without python3)."""
+    if FROZEN:
+        py = shutil.which("python3") or shutil.which("python")
+        base = getattr(sys, "_MEIPASS", os.path.dirname(os.path.abspath(__file__)))
+        script = os.path.join(base, "vendor", "undervolt.py")
+        if not py or not os.path.exists(script):
+            return None
+        return [py, script] + extra_args
+    return [sys.executable, UNDERVOLT_PATH] + extra_args
+
 
 # Reuse one runner per purpose instead of creating/destroying one every update
 _undervolt_runner = CommandRunner()
@@ -35,27 +52,21 @@ _status_runner = CommandRunner()
 
 ## Read the current undervoltage offsets
 def checkUndervoltStatus(self):
-    if FROZEN:
+    cmd = _undervolt_cmd(["-r"])
+    if cmd is None:
         self.undervolt = UNDERVOLT_FROZEN_MSG
         return
-    _status_runner.run("sudo", [sys.executable, UNDERVOLT_PATH, "-r"])
+    _status_runner.run("sudo", cmd)
     self.undervolt = _status_runner.output
 
 
 ## Apply the undervoltage offset values (negative mV)
 def applyUndervolt(self, core, cache):
-    if FROZEN:
+    cmd = _undervolt_cmd(["--core", "-" + str(core), "--cache", "-" + str(cache)])
+    if cmd is None:
         self.undervolt = UNDERVOLT_FROZEN_MSG
         return
-    _undervolt_runner.run(
-        "sudo",
-        [
-            sys.executable,
-            UNDERVOLT_PATH,
-            "--core", "-" + str(core),
-            "--cache", "-" + str(cache),
-        ],
-    )
+    _undervolt_runner.run("sudo", cmd)
     ## Confirm the settings were properly applied
     checkUndervoltStatus(self)
 

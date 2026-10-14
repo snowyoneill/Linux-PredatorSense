@@ -58,6 +58,7 @@ jobs:
           ```
 
           Requires EC access (ec_sys write_support=1 or the acpi_ec DKMS
-          module) - see README. Binaries are built on Ubuntu 24.04; other
+          module) - see README. Intel undervolt is bundled and runs with
+          the system python3. Binaries are built on Ubuntu 24.04; other
           distros should run from source.
         files: dist/linux-predatorsense-${{ github.ref_name }}
