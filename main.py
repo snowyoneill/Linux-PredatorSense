@@ -146,7 +146,7 @@ class PreviewEC:
     def ec_write(self, address, value):
         self.mem[address] = value
 
-    def shutdownEC(self):
+    def shutdown_ec(self):
         print("[PREVIEW] simulated EC closed.")
 
 ##------------------------------##
@@ -812,7 +812,7 @@ class MainWindow(QtWidgets.QDialog, Ui_PredatorSense):
     # Exit the program cleanly
     def shutdown(self):
         print("Cleaning up..")
-        self.ECHandler.shutdownEC()
+        self.ECHandler.shutdown_ec()
         print("Exiting")
         ## Hard exit: this runs from a Qt signal handler (button click / SIGINT),
         ## so raising SystemExit via sys.exit() would propagate through a C++
@@ -884,7 +884,7 @@ if "--dump" in sys.argv:
     print("gpuFanMode        :", application.gpuFanMode.name)
     print("chargeLimit       :", application.batteryChargeLimitValue.text().strip())
     app.processEvents()
-    application.ECHandler.shutdownEC()
+    application.ECHandler.shutdown_ec()
     sys.exit(0)
 
 app.exec()

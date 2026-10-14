@@ -79,7 +79,7 @@ class ECWrite:
         except Exception as e:
             self._handle_error(f"Error reading from the EC buffer: {e}")
 
-    def shutdownEC(self):
+    def shutdown_ec(self):
         if self.ec_file:
             self.ec_file.close()
             print("EC access successfully terminated.")
