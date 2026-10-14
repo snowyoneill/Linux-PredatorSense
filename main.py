@@ -814,8 +814,12 @@ class MainWindow(QtWidgets.QDialog, Ui_PredatorSense):
         print("Cleaning up..")
         self.ECHandler.shutdownEC()
         print("Exiting")
-        # app.exit(0)
-        exit(0)
+        ## Hard exit: this runs from a Qt signal handler (button click / SIGINT),
+        ## so raising SystemExit via sys.exit() would propagate through a C++
+        ## frame and abort(). Bare exit() is only defined by the site module,
+        ## which a PyInstaller bundle does not load (NameError in the binary).
+        ## The EC handle is already closed above, so nothing to flush.
+        os._exit(0)
 
 app = QtWidgets.QApplication(sys.argv)
 

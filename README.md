@@ -191,6 +191,9 @@ Packages:
 
 Oct 13, 2026
 
+main.py
+- **Fix: crash on exit in the release binary.** ```shutdown()``` called bare ```exit(0)```, which only exists because the ```site``` module injects it - a PyInstaller bundle does not load it, so closing the app raised ```NameError``` inside a Qt signal handler and aborted with ```SIGABRT``` (core dump). Exit is now ```os._exit(0)``` after the EC handle is closed; ```sys.exit()``` is unsafe here because raising ```SystemExit``` through a C++ frame aborts the same way.
+
 core/vendor (new)
 - **Intel undervolt now works from the release binary.** ```undervolt.py``` v0.4.0 is vendored from the [upstream project](https://github.com/georgewhewell/undervolt) (GPL-2.0-or-later, license kept in ```core/vendor/LICENSE.txt```) and bundled by PyInstaller via ```main.spec```. In a frozen build the app runs the bundled script with a system ```python3``` (```shutil.which```), since ```sys.executable``` inside a bundle is the app itself, not an interpreter. Source installs are unchanged (venv copy still preferred). If a frozen build finds no ```python3``` at all, the status label says so instead of failing.
 
