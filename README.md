@@ -94,10 +94,10 @@ Two notes:
 - On kernels 5.9+, userspace MSR writes are restricted by default. amdctl lifts this with its `-m` flag, which the app already passes on every call — no extra setup needed.
 - Zen 4/5 silicon *does* support undervolting, but through the SMU-based **Curve Optimizer** (PBO) — a different mechanism amdctl does not implement. On Windows that is reachable with tools like Universal x86 Tuning Utility or G-Helper; there is no equivalent wired into this app on Linux yet.
 
-### ICON
+### DESKTOP APPLICATION
  - The window icon and title follow the detected machine: Predator machines get ```assets/predatorsense.ico``` and the title ```Linux PredatorSense```, Nitro machines get ```assets/nitrosense.ico``` and ```Linux NitroSense```.
  - Two ```.desktop``` templates ship with the repo: ```predator-sense.desktop``` (```StartupWMClass=Linux PredatorSense```) and ```nitrosense.desktop``` (```StartupWMClass=Linux NitroSense```). The Ubuntu/GNOME dock matches a running window to a ```.desktop``` file via ```StartupWMClass```, which must equal the window title the app sets — so install the one matching your machine (or both) for the dock to show the right icon. Icons are PNG (```assets/*.png```), the preferred icon format on Linux; the ```.ico``` files remain for the in-app window icon and Windows-style packaging.
- - Alternatively you can copy the .desktop file to your applications folder and launch the program via it's icon.
+ - Alternatively you can copy the .desktop file to your applications folder and launch the program via its icon.
   - Open ```predator-sense.desktop``` (or ```nitrosense.desktop```) in a text editor.
   - Set ```<path_to_PredatorSense>``` to the directory where you downloaded this project.
   ```
