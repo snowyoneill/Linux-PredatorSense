@@ -190,6 +190,9 @@ Packages:
 
 Oct 13, 2026
 
+core/intelctl.py
+- **Fix: release binary launched itself repeatedly.** In a PyInstaller one-file bundle, ```sys.executable``` is the bundle itself, not a Python interpreter, so the ```sudo <python> undervolt.py -r``` status query actually ran ```sudo <the binary> undervolt.py -r``` - each instance spawned another copy of the app in a chain. Undervolt is now disabled in frozen builds (```sys.frozen```/```_MEIPASS``` guard): the status label reads "Undervolt unavailable in the binary build (install from source)" and no process is spawned. Intel undervolt from source is unchanged.
+
 main.py / ui/frontend.py
 - The Offset selector moved out of the Undervolt box into the middle column, directly above the ```Undervolt``` button, so the value and the action are adjacent. The ```Offset:``` label was dropped since each item reads e.g. ```-140 mV```.
 - The Offset selector is now **editable**: pick a 20 mV preset from the list or type any exact value (e.g. ```-85 mV```) for fine-grained offsets between the presets. A validator restricts input to a signed 3-digit mV value, and the value is clamped to 0..700 mV before it reaches the MSR. The combo and its dropdown popup are styled to match the dark theme.

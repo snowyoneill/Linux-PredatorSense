@@ -18,6 +18,16 @@ UNDERVOLT_PATH = os.path.join(
     "venv", "lib", "python3.12", "site-packages", "undervolt.py",
 )
 
+## In a PyInstaller one-file bundle there is no venv, and sys.executable points at
+## the bundle itself rather than a Python interpreter. Running "sudo <bundle>
+## undervolt.py -r" would just launch another copy of the app (which would launch
+## another, and so on), so undervolt is disabled in frozen builds until the script
+## is bundled and a real interpreter is resolved.
+FROZEN = bool(getattr(sys, "frozen", False) or hasattr(sys, "_MEIPASS"))
+UNDERVOLT_FROZEN_MSG = (
+    "Undervolt unavailable in the binary build (install from source)."
+)
+
 # Reuse one runner per purpose instead of creating/destroying one every update
 _undervolt_runner = CommandRunner()
 _status_runner = CommandRunner()
@@ -25,12 +35,18 @@ _status_runner = CommandRunner()
 
 ## Read the current undervoltage offsets
 def checkUndervoltStatus(self):
+    if FROZEN:
+        self.undervolt = UNDERVOLT_FROZEN_MSG
+        return
     _status_runner.run("sudo", [sys.executable, UNDERVOLT_PATH, "-r"])
     self.undervolt = _status_runner.output
 
 
 ## Apply the undervoltage offset values (negative mV)
 def applyUndervolt(self, core, cache):
+    if FROZEN:
+        self.undervolt = UNDERVOLT_FROZEN_MSG
+        return
     _undervolt_runner.run(
         "sudo",
         [
