@@ -14,9 +14,12 @@ if [ -f "$FILE" ]; then
 	chmod +x /usr/bin/predator-sense
 	sleep 1
 	echo -e "\033[0;32mCreating desktop entry..."
-	touch /usr/share/applications/predator-sense.desktop
-	printf "[Desktop Entry]\nEncoding=UTF-8\nVersion=1.0\nType=Application\nTerminal=false\nExec=/usr/bin/predator-sense\nName=Predator Sense™\nComment=Application to control fan speed for Acer Predator Helios 300\nIcon=/usr/share/icons/predator-sense" > /usr/share/applications/predator-sense.desktop
-	cp app_icon.ico /usr/share/icons/predator-sense
+	# Mirrors the repo template (predator-sense.desktop): no deprecated
+	# Encoding key, StartupWMClass matches the window title so the dock shows
+	# the icon, PNG icon (preferred Linux format). Exec points at the
+	# pkexec wrapper installed above instead of the source tree.
+	printf "[Desktop Entry]\nName=Linux PredatorSense\nStartupWMClass=Linux PredatorSense\nVersion=1.0\nType=Application\nTerminal=false\nExec=/usr/bin/predator-sense\nComment=Application to control fan speed for Acer Predator Helios 300\nIcon=/usr/share/icons/predatorsense.png\n" > /usr/share/applications/predator-sense.desktop
+	cp assets/predatorsense.png /usr/share/icons/predatorsense.png
 	sleep 1
 	echo -e "\033[0;32mInstalling custom fonts..."
 	mkdir -p /usr/local/share/fonts/s

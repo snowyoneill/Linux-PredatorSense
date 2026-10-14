@@ -1,0 +1,63 @@
+name: Python application
+
+on:
+  push:
+    branches: [ "master" ]
+  pull_request:
+    branches: [ "master" ]
+
+permissions:
+  contents: read
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+
+    steps:
+    - uses: actions/checkout@v4
+
+    - name: Set up Python
+      uses: actions/setup-python@v5
+      with:
+        python-version: "3.12"
+
+    - name: Install system dependencies
+      run: |
+        sudo apt-get update
+        sudo apt-get install -y pyqt5-dev-tools qtbase5-dev python3-pyqt5 python3-pyqt5.qtchart
+
+    - name: Install dependencies
+      run: |
+        python -m pip install --upgrade pip
+        pip install flake8
+        if [ -f requirements.txt ]; then pip install -r requirements.txt; fi
+
+    - name: Lint with flake8
+      run: |
+        # stop the build if there are Python syntax errors or undefined names
+        flake8 . --count --select=E9,F63,F7,F82 --show-source --statistics
+        # report the rest without failing
+        flake8 . --count --max-line-length=127 --statistics || true
+
+    - name: Byte-compile
+      run: python -m compileall -q main.py core ui utils
+
+    - name: Run smoke test
+      # Offscreen preview run: starts the app against a simulated EC (no
+      # root, no hardware) and asserts config persistence, the LCD-overdrive
+      # bitwise round-trip and the undervolt dropdown range.
+      env:
+        QT_QPA_PLATFORM: offscreen
+      run: python tests/smoke_test.py
+
+    - name: Build binary
+      run: |
+        pip install pyinstaller
+        pyinstaller main.spec
+
+    - name: Upload binary
+      uses: actions/upload-artifact@v4
+      with:
+        name: predator-sense
+        path: dist/main
+        overwrite: true

@@ -2,3 +2,11 @@ dist
 build
 .idea
 __pycache__
+check_all_voltages.py
+check_voltage.sh
+check_voltage_all.sh
+modprobe.txt
+KeyCode
+venv/
+tests/*.png
+LinuxPredatorSenseOLD.png

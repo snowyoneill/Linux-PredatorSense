@@ -1,0 +1,5 @@
+PyQt5
+pyqtchart
+# Optional - Intel undervolting (installed into ./venv)
+# undervolt @ git+https://github.com/georgewhewell/undervolt.git
+# Optional - AMD undervolting / voltage read: https://github.com/kevinlekiller/amdctl
