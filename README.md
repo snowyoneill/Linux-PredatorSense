@@ -38,16 +38,15 @@ cd Linux-PredatorSense/
   ```
   On a Nitro the Predator-only controls (Turbo mode, LCD Overdrive) are hidden automatically. Add ```--dump``` to print the resulting widget state and exit, which is handy for quick checks.
 
-_[OPTIONAL - undervolt only]_
+**[OPTIONAL - undervolt only]**
 - **Intel** undervolting uses the [undervolt](https://github.com/georgewhewell/undervolt) package. Install it into the same venv the app runs from:
   ```
   ./venv/bin/pip install git+https://github.com/georgewhewell/undervolt.git
   ```
-  ```core/intelctl.py``` resolves ```UNDERVOLT_PATH``` to that venv automatically and runs it with ```sys.executable```, so it works under ```sudo``` without a system-wide install and you do **not** need ```which undervolt``` to point anywhere.
-  The release binary needs no install at all: a copy of ```undervolt.py``` (v0.4.0, GPL-2.0-or-later) is vendored in ```core/vendor/``` and bundled into the binary, where it runs with the system ```python3```.
-- **AMD** undervolting uses [amdctl](https://github.com/kevinlekiller/amdctl), a small C program (no pip). Build it and install it somewhere on **root's** PATH (the app runs it as a bare `amdctl` under `sudo`); `/usr/local/bin` works on most distros:
+  The app finds it in the venv automatically, so no system-wide install is needed. The release binary needs no install at all: ```undervolt.py``` (v0.4.0, GPL-2.0-or-later) is vendored in ```core/vendor/``` and bundled with it.
+- **AMD** undervolting uses [amdctl](https://github.com/kevinlekiller/amdctl). Build it and install it somewhere on **root's** PATH (the app runs it as a bare `amdctl` under `sudo`); `/usr/local/bin` works on most distros:
   ```
-  sudo apt install build-essential   # amdctl is a C program; needs gcc/make to build
+  sudo apt install build-essential   # amdctl is a C program
   git clone https://github.com/kevinlekiller/amdctl.git
   cd amdctl && make
   sudo cp amdctl /usr/local/bin/ && sudo chmod +x /usr/local/bin/amdctl
@@ -58,6 +57,9 @@ _[OPTIONAL - undervolt only]_
 
 ### UNDERVOLT SUPPORT BY CPU GENERATION
 Whether you can *apply* an undervolt, and whether the live VCore readout works, depends heavily on the CPU generation. Intel has progressively locked the voltage-offset MSRs (the Plundervolt mitigations), so this is not a software limitation of the app.
+
+<details>
+  <summary>Intel undervolt</summary>
 
 | CPU generation | Apply undervolt | VCore readout (MSR 0x198) |
 |---|---|---|
@@ -81,6 +83,10 @@ On 11th-gen H45 parts (11980HK / 11900H / 11800H / 11400H) the offset MSRs are g
 6. Reboot. Success prints `Variable Index[05b]: Set Successfully`. Undervolt should now apply from the app.
 
 Full original guide (with screenshots and a video) by **u/dglt1**: [*"Unlock Undervolting on 11th Gen (H45) Nitro 5 Within Minutes"*](https://www.reddit.com/r/AcerNitro/comments/qvznen/unlock_undervolting_on_11th_gen_h45_nitro_5/) on r/AcerNitro. H35 parts (11300H / 11370H) are **not** covered by that method.
+</details>
+
+<details>
+  <summary>AMD undervolt</summary>
 
 #### AMD (via amdctl)
 AMD has **not** hardware-locked undervolting the way Intel did, but this app applies AMD offsets through [amdctl](https://github.com/kevinlekiller/amdctl), which writes the legacy P-state VID MSRs and supports CPU families **10h–19h** — K10 (2007) through **Zen 3 (Ryzen 5000 series and older)**.
@@ -95,9 +101,11 @@ Two notes:
 - On kernels 5.9+, userspace MSR writes are restricted by default. amdctl lifts this with its `-m` flag, which the app already passes on every call — no extra setup needed.
 - Zen 4/5 silicon *does* support undervolting, but through the SMU-based **Curve Optimizer** (PBO) — a different mechanism amdctl does not implement. On Windows that is reachable with tools like Universal x86 Tuning Utility or G-Helper; there is no equivalent wired into this app on Linux yet.
 
+</details>
+
 ### DESKTOP APPLICATION
  - The window icon and title follow the detected machine: Predator machines get ```assets/predatorsense.ico``` and the title ```Linux PredatorSense```, Nitro machines get ```assets/nitrosense.ico``` and ```Linux NitroSense```.
- - Two ```.desktop``` templates ship with the repo: ```predator-sense.desktop``` (```StartupWMClass=Linux PredatorSense```) and ```nitrosense.desktop``` (```StartupWMClass=Linux NitroSense```). The Ubuntu/GNOME dock matches a running window to a ```.desktop``` file via ```StartupWMClass```, which must equal the window title the app sets — so install the one matching your machine (or both) for the dock to show the right icon. Icons are PNG (```assets/*.png```), the preferred icon format on Linux; the ```.ico``` files remain for the in-app window icon and Windows-style packaging.
+ - Two ```.desktop``` templates ship with the repo: ```predator-sense.desktop``` and ```nitrosense.desktop```. Install the one matching your machine (or both): the dock matches windows to ```.desktop``` files via ```StartupWMClass```, so the right icon shows. Icons are PNG (```assets/*.png```); the ```.ico``` files are only used for the in-app window icon.
  - Alternatively you can copy the .desktop file to your applications folder and launch the program via its icon.
   - Open ```predator-sense.desktop``` (or ```nitrosense.desktop```) in a text editor.
   - Set ```<path_to_PredatorSense>``` to the directory where you downloaded this project.
